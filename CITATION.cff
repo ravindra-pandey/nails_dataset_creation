@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use this dataset, please cite it as below."
+authors:
+  - family-names: "Pandey"
+    given-names: "Ravindra"
+    orcid: "[^1^][1]"
+title: "Nails Dataset"
+version: 1.0.0
+doi: 10.5281/zenodo.1234
+date-released: 2023-09-19
+url: "[^2^][2]"
