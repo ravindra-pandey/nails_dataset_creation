@@ -47,9 +47,10 @@ except Exception as e:
     pass
 
 
-def ask_questions(image_path: str) -> Literal[True]:
+def ask_questions(image_path: str) -> None:
     """
-    this fucntion is used to take user inputs according to the columns in the dataframe.
+    this fucntion is used to take user inputs 
+    according to the columns in the dataframe.
     """
     for key, value in columns_details.items():
         state = True
@@ -69,12 +70,12 @@ def ask_questions(image_path: str) -> Literal[True]:
 
             # This line of code will automatically clear terminal
             os.system('cls' if os.name == 'nt' else 'clear')
-    return True
+
 
 # display of the image
 
 
-def display_image(img_path: str) -> Literal[True]:
+def display_image(img_path: str) -> None:
     """
     This function is responsible for:
      - reading the image and displaying that
@@ -91,7 +92,6 @@ def display_image(img_path: str) -> Literal[True]:
     cv2.imshow(img_path.split("/")[-1], image)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
-    return True
 
 
 # the images which have been annotated will be moved to this directory
