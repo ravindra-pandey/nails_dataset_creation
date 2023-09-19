@@ -4,6 +4,7 @@ import os
 import shutil
 import re
 import threading
+from typing import Literal
 
 import cv2
 import numpy as np
@@ -19,6 +20,7 @@ images_list = [f"{root}/{file}" for root, dir,
 dataset = {
     "image_name": [],
     "length": [],
+    "shape": [],
     "nail_texture": [],
     "moon": [],
     "color": [],
@@ -29,7 +31,8 @@ dataset = {
 columns_details = {
     "image_name": "path of the image",
     "length": "It shows length of the nails:\n [0]: short \n [1]: Normal \n [2]: Long",
-    "nail_texture": "It shows tecture of nails: \n [0]: Normal \n [1]: BAD \n [2]: Too bad",
+    "shape": "It shows the curve of the nails \n [0] : flat \n [1]: Normal \n [2]: Curvy",
+    "nail_texture": "It shows tecture of nails: \n [0]: shiny \n [1]: normal \n [2]: Rough",
     "moon": "It shows the size of the moon: \n [0]: No moon \n [1]: Little Moon \n [2]: Large Moon",
     "color": "It represents the color of the Nail \n [R]: Red \n [Y]: [yellow] \n [W]: Whitish \n [P]: Pale \n [C]: Cloudy",
     "bitting": "It represents bitting of the nail \n [0]: No bitting \n [1]: Bitting",
@@ -40,11 +43,11 @@ columns_details = {
 try:
     previous_data = pd.read_csv(DATASET_PATH, index_col="Unnamed: 0")
 except Exception as e:
-    pass
     previous_data = pd.DataFrame(dataset)
+    pass
 
 
-def ask_questions(image_path: str) -> None:
+def ask_questions(image_path: str) -> Literal[True]:
     """
     this fucntion is used to take user inputs according to the columns in the dataframe.
     """
@@ -58,19 +61,20 @@ def ask_questions(image_path: str) -> None:
 
             while state:
                 u_input = input("Enter any option from above:")
-                if u_input in valid_inputs:
+                if u_input.capitalize() in valid_inputs:
                     state = False
                 else:
                     print("wrong_input")
-            dataset[key].append(u_input)
+            dataset[key].append(u_input.capitalize())
 
             # This line of code will automatically clear terminal
             os.system('cls' if os.name == 'nt' else 'clear')
+    return True
 
 # display of the image
 
 
-def display_image(img_path: str) -> None:
+def display_image(img_path: str) -> Literal[True]:
     """
     This function is responsible for:
      - reading the image and displaying that
@@ -87,13 +91,14 @@ def display_image(img_path: str) -> None:
     cv2.imshow(img_path.split("/")[-1], image)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
+    return True
 
 
 # the images which have been annotated will be moved to this directory
 os.makedirs("dataset_annotated", exist_ok=True)
 
 # Dataset annotations on action
-for img_path in images_list:
+for img_path in images_list[:1]:
 
     display_thread = threading.Thread(target=display_image, args=(img_path,))
     questions_thread = threading.Thread(target=ask_questions, args=(img_path,))
