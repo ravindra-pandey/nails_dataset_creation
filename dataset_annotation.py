@@ -39,7 +39,8 @@ columns_details = {
 # We will be reading this to concat the dataset to previously annotated dataset
 try:
     previous_data = pd.read_csv(DATASET_PATH, index_col="Unnamed: 0")
-except:
+except Exception as e:
+    pass
     previous_data = pd.DataFrame(dataset)
 
 
