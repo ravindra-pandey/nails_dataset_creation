@@ -92,7 +92,7 @@ def display_image(img_path: str) -> None:
 os.makedirs("dataset_annotated", exist_ok=True)
 
 # Dataset annotations on action
-for img_path in images_list[:1]:
+for img_path in images_list:
 
     display_thread = threading.Thread(target=display_image, args=(img_path,))
     questions_thread = threading.Thread(target=ask_questions, args=(img_path,))
@@ -105,13 +105,14 @@ for img_path in images_list[:1]:
         f"Sucessfully recorded data, Now drop the image for updating this to : {DATASET_PATH}")
     display_thread.join()
 
+    # Moving the annotated image to another folder named "dataset_annotated"
     dest_dir = os.path.join(
         "dataset_annotated", img_path.split("/")[-1])
     shutil.move(img_path, dest_dir)
     print(f"successfully moved the image to {dest_dir}")
 
-# Saving the Updated dataset back to csv file
-pd.concat([previous_data, pd.DataFrame(dataset)],
-          ignore_index=True).to_csv(DATASET_PATH)
+    # Saving the Updated dataset back to csv file
+    pd.concat([previous_data, pd.DataFrame(dataset)],
+              ignore_index=True).to_csv(DATASET_PATH)
 
-print(f"succesfully updated csv file: { DATASET_PATH }")
+    print(f"succesfully updated csv file: { DATASET_PATH }")
