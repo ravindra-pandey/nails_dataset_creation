@@ -9,6 +9,8 @@ import cv2
 import numpy as np
 import pandas as pd
 
+DATASET_PATH = "nails_dataset.csv"
+
 # Reading all the images_name
 images_list = [f"{root}/{file}" for root, dir,
                files in os.walk("curated_dataset") for file in files]
@@ -36,7 +38,7 @@ columns_details = {
 
 # We will be reading this to concat the dataset to previously annotated dataset
 try:
-    previous_data = pd.read_csv("nails_dataset.csv", index_col="Unnamed: 0")
+    previous_data = pd.read_csv(DATASET_PATH, index_col="Unnamed: 0")
 except:
     previous_data = pd.DataFrame(dataset)
 
@@ -60,6 +62,9 @@ def ask_questions(image_path: str) -> None:
                 else:
                     print("wrong_input")
             dataset[key].append(u_input)
+
+            # This line of code will automatically clear terminal
+            os.system('cls' if os.name == 'nt' else 'clear')
 
 # display of the image
 
@@ -94,12 +99,19 @@ for img_path in images_list[:1]:
 
     display_thread.start()
     questions_thread.start()
-    questions_thread.join()
 
+    questions_thread.join()
+    print(
+        f"Sucessfully recorded data, Now drop the image for updating this to : {DATASET_PATH}")
     display_thread.join()
-    shutil.move(img_path, os.path.join(
-        "dataset_annotated", img_path.split("/")[-1]))
+
+    dest_dir = os.path.join(
+        "dataset_annotated", img_path.split("/")[-1])
+    shutil.move(img_path, dest_dir)
+    print(f"successfully moved the image to {dest_dir}")
 
 # Saving the Updated dataset back to csv file
 pd.concat([previous_data, pd.DataFrame(dataset)],
-          ignore_index=True).to_csv("nails_dataset.csv")
+          ignore_index=True).to_csv(DATASET_PATH)
+
+print(f"succesfully updated csv file: { DATASET_PATH }")
