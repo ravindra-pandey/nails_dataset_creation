@@ -1,10 +1,11 @@
+"importing all the libraries"
+
 import os,shutil,re
+import threading
+
 import cv2
 import numpy as np
 import pandas as pd
-
-# We will be reading this to concat the dataset to previously annotated dataset
-previous_data=pd.read_csv("nails_dataset.csv")
 
 # Reading all the images_name
 images_list=[f"{root}/{file}" for root,dir,files in os.walk("curated_dataset") for file in files]
@@ -19,7 +20,6 @@ dataset={
         "bitting":[],
         "nails_side_texture":[]
         }
-
 # details of the dataset
 columns_details={
                 "image_name":"path of the image",
@@ -30,6 +30,12 @@ columns_details={
                 "bitting" : "It represents bitting of the nail \n [0]: No bitting \n [1]: Bitting",
                 "nails_side_texture": "It represents skin texture of nails side \n [0]: Normal \n [1]: BAD \n [2]: Too bad"
                 }
+
+# We will be reading this to concat the dataset to previously annotated dataset
+try:
+    previous_data=pd.read_csv("nails_dataset.csv")
+except:
+    previous_data=pd.DataFrame(dataset)
 
 # the images which have been annotated will be moved to this directory
 os.makedirs("dataset_annoted",exist_ok=True)
@@ -50,9 +56,8 @@ def ask_questions(image_path):
                 else:
                     print("wrong_input")
             dataset[key].append(u_input)
-
-# Dataset annotations on action
-for img_path in images_list:
+# display of the image
+def display_image(img_path):
     image=cv2.imread(img_path)
     h,w,_=image.shape
     if h<450 or w < 450:
@@ -61,8 +66,21 @@ for img_path in images_list:
         image=cv2.resize(image,(int(w*0.7),int(h*0.7)))
         
     cv2.imshow("image",image)
-    ask_questions(img_path)
     cv2.waitKey(0)
     cv2.destroyAllWindows()  
 
-pd.concat([previous_data,pd.DataFrame(dataset)],axis=1)
+
+# Dataset annotations on action
+for img_path in images_list[:1]:
+    display_thread=threading.Thread(target=display_image,args=(img_path,))
+    questions_thread=threading.Thread(target=ask_questions,args=(img_path,))
+
+    display_thread.start()
+    questions_thread.start()
+
+    display_thread.join()
+    questions_thread.join()
+
+
+# Saving the Updated dataset back to csv file
+pd.concat([previous_data,pd.DataFrame(dataset)],axis=0).to_csv("nails_dataset.csv")
