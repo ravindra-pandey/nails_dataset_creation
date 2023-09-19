@@ -26,19 +26,17 @@ columns_details={
                 "length" : "It shows length of the nails:\n [0]: short \n [1]: Normal \n [2]: Long",
                 "nail_texture" : "It shows tecture of nails: \n [0]: Normal \n [1]: BAD \n [2]: Too bad",
                 "moon" : "It shows the size of the moon: \n [0]: No moon \n [1]: Little Moon \n [2]: Large Moon",
-                "color" : "It represents the color of the Nail \n [r]: Red \n [Y]: [yellow] \n [W]: Whitish \n [P]: Pale \n [C]: Cloudy",
+                "color" : "It represents the color of the Nail \n [R]: Red \n [Y]: [yellow] \n [W]: Whitish \n [P]: Pale \n [C]: Cloudy",
                 "bitting" : "It represents bitting of the nail \n [0]: No bitting \n [1]: Bitting",
                 "nails_side_texture": "It represents skin texture of nails side \n [0]: Normal \n [1]: BAD \n [2]: Too bad"
                 }
 
 # We will be reading this to concat the dataset to previously annotated dataset
 try:
-    previous_data=pd.read_csv("nails_dataset.csv")
+    previous_data=pd.read_csv("nails_dataset.csv",index_col="Unnamed: 0")
 except:
     previous_data=pd.DataFrame(dataset)
 
-# the images which have been annotated will be moved to this directory
-os.makedirs("dataset_annoted",exist_ok=True)
 
 def ask_questions(image_path):
     for key,value in columns_details.items():
@@ -56,9 +54,7 @@ def ask_questions(image_path):
                 else:
                     print("wrong_input")
             dataset[key].append(u_input)
-    # Adding to automatically destroy the image 
-    cv2.destroyAllWindows()
-    
+            
 # display of the image
 def display_image(img_path):
     image=cv2.imread(img_path)
@@ -72,18 +68,21 @@ def display_image(img_path):
     cv2.waitKey(0)
     cv2.destroyAllWindows()  
 
+# the images which have been annotated will be moved to this directory
+os.makedirs("dataset_annotated",exist_ok=True)
 
 # Dataset annotations on action
 for img_path in images_list[:1]:
+    
     display_thread=threading.Thread(target=display_image,args=(img_path,))
     questions_thread=threading.Thread(target=ask_questions,args=(img_path,))
 
     display_thread.start()
     questions_thread.start()
-
-    display_thread.join()
     questions_thread.join()
 
-
+    display_thread.join()
+    shutil.move(img_path,os.path.join("dataset_annotated",img_path.split("/")[-1]))
+    
 # Saving the Updated dataset back to csv file
-pd.concat([previous_data,pd.DataFrame(dataset)],axis=0).to_csv("nails_dataset.csv")
+pd.concat([previous_data,pd.DataFrame(dataset)],ignore_index=True).to_csv("nails_dataset.csv")
