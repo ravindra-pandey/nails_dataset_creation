@@ -56,6 +56,9 @@ def ask_questions(image_path):
                 else:
                     print("wrong_input")
             dataset[key].append(u_input)
+    # Adding to automatically destroy the image 
+    cv2.destroyAllWindows()
+    
 # display of the image
 def display_image(img_path):
     image=cv2.imread(img_path)
